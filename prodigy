@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Navigation Menu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Navigation Menu Styles */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(30, 60, 114, 0.95);
+            padding: 15px 0;
+            transition: all 0.4s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        nav.scrolled {
+            background-color: rgba(15, 32, 65, 0.98);
+            padding: 10px 0;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            font-size: 1.9rem;
+        }
+
+        .logo:hover {
+            color: #4dabf7;
+        }
+
+        .menu {
+            display: flex;
+            list-style: none;
+        }
+
+        .menu li {
+            margin-left: 30px;
+        }
+
+        .menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        /* Hover effect for menu items */
+        .menu a:hover {
+            background-color: rgba(77, 171, 247, 0.2);
+            color: #4dabf7;
+            transform: translateY(-2px);
+        }
+
+        .menu a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background-color: #4dabf7;
+            transition: all 0.3s ease;
+        }
+
+        .menu a:hover::after {
+            width: 80%;
+            left: 10%;
+        }
+
+        /* Active menu item style */
+        .menu a.active {
+            background-color: rgba(77, 171, 247, 0.3);
+            color: #4dabf7;
+        }
+
+        /* Scroll indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            width: 0;
+            background-color: #4dabf7;
+            transition: width 0.2s;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(30, 60, 114, 0.8), rgba(15, 32, 65, 0.9)), url('https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 0 20px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            max-width: 700px;
+            margin-bottom: 30px;
+        }
+
+        /* Content Sections */
+        .content-section {
+            max-width: 1200px;
+            margin: 80px auto;
+            padding: 0 20px;
+        }
+
+        .content-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #1e3c72;
+            text-align: center;
+        }
+
+        .content-section p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .content-section .cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .card {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h3 {
+            color: #1e3c72;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .card i {
+            font-size: 2.5rem;
+            color: #4dabf7;
+            margin-bottom: 20px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #0f2041;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 60px;
+        }
+
+        /* Scroll to top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background-color: #1e3c72;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .scroll-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-top:hover {
+            background-color: #4dabf7;
+            transform: scale(1.1);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+            }
+
+            .logo {
+                margin-bottom: 15px;
+            }
+
+            .menu {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .menu li {
+                margin: 5px 10px;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .content-section h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Menu -->
+    <nav id="mainNav">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <i class="fas fa-code"></i>
+                CodeNav
+            </a>
+            <ul class="menu">
+                <li><a href="#home" class="active">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#portfolio">Portfolio</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+        <div class="scroll-indicator" id="scrollIndicator"></div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <h1>Interactive Navigation Menu</h1>
+        <p>This menu changes style when scrolling and hovering. Try scrolling down or hovering over menu items to see the effects.</p>
+        <p><i class="fas fa-arrow-down"></i> Scroll down to see the navigation change <i class="fas fa-arrow-down"></i></p>
+    </section>
+
+    <!-- Content Sections -->
+    <section class="content-section" id="about">
+        <h2>About Us</h2>
+        <p>This interactive navigation menu demonstrates dynamic styling changes based on user interaction. When you scroll down, the menu background becomes darker and more opaque. When you hover over menu items, they change color and lift up slightly.</p>
+        <p>The menu is fixed to the top of the page, so it remains visible as you scroll through different sections. This is a common pattern in modern web design that enhances user experience.</p>
+        
+        <div class="cards">
+            <div class="card">
+                <i class="fas fa-palette"></i>
+                <h3>Color Changes</h3>
+                <p>The navigation menu transitions between two color schemes based on scroll position. Hover effects apply different colors to menu items.</p>
+            </div>
+            <div class="card">
+                <i class="fas fa-mouse-pointer"></i>
+                <h3>Hover Effects</h3>
+                <p>Each menu item has a smooth hover animation that changes background color, text color, and adds an underline effect.</p>
+            </div>
+            <div class="card">
+                <i class="fas fa-scroll"></i>
+                <h3>Scroll Detection</h3>
+                <p>JavaScript monitors scroll position to apply different styles to the navigation menu and update the active menu item.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-section" id="services">
+        <h2>Our Services</h2>
+        <p>We specialize in creating interactive web components that enhance user engagement and improve navigation experience. Our solutions include dynamic menus, scroll-triggered animations, and responsive design implementations.</p>
+        
+        <div class="cards">
+            <div class="card">
+                <i class="fas fa-laptop-code"></i>
+                <h3>Web Development</h3>
+                <p>Building modern, responsive websites with interactive elements like this navigation menu.</p>
+            </div>
+            <div class="card">
+                <i class="fas fa-mobile-alt"></i>
+                <h3>Mobile Design</h3>
+                <p>Creating mobile-friendly interfaces that work seamlessly across all device sizes.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-section" id="portfolio">
+        <h2>Portfolio</h2>
+        <p>Explore our collection of interactive web components and design implementations. Each project demonstrates unique approaches to user interface challenges.</p>
+        <p>This navigation menu is just one example of how we combine HTML, CSS, and JavaScript to create engaging user experiences.</p>
+    </section>
+
+    <section class="content-section" id="contact">
+        <h2>Contact Us</h2>
+        <p>If you're interested in implementing interactive components like this navigation menu on your website, get in touch with us. We can create custom solutions tailored to your specific needs.</p>
+        <p>Try scrolling back to the top to see the navigation menu return to its original state, or hover over different menu items to see the hover effects.</p>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>Interactive Navigation Menu Demo &copy; 2023 | Created with HTML, CSS, and JavaScript</p>
+        <p>Scroll position: <span id="scrollPosition">0</span>px</p>
+    </footer>
+
+    <!-- Scroll to top button -->
+    <div class="scroll-top" id="scrollTop">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <script>
+        // Get DOM elements
+        const nav = document.getElementById('mainNav');
+        const menuItems = document.querySelectorAll('.menu a');
+        const scrollIndicator = document.getElementById('scrollIndicator');
+        const scrollTopBtn = document.getElementById('scrollTop');
+        const scrollPositionElement = document.getElementById('scrollPosition');
+        
+        // Function to update navigation on scroll
+        function updateNavOnScroll() {
+            // Get current scroll position
+            const scrollPosition = window.scrollY;
+            
+            // Update scroll position display
+            scrollPositionElement.textContent = scrollPosition;
+            
+            // Add/remove scrolled class based on scroll position
+            if (scrollPosition > 50) {
+                nav.classList.add('scrolled');
+                scrollTopBtn.classList.add('show');
+            } else {
+                nav.classList.remove('scrolled');
+                scrollTopBtn.classList.remove('show');
+            }
+            
+            // Update scroll indicator width
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight - windowHeight;
+            const scrollPercentage = (scrollPosition / documentHeight) * 100;
+            scrollIndicator.style.width = `${scrollPercentage}%`;
+            
+            // Update active menu item based on scroll position
+            updateActiveMenuItem();
+        }
+        
+        // Function to update active menu item
+        function updateActiveMenuItem() {
+            // Get all sections
+            const sections = document.querySelectorAll('section');
+            let currentSectionId = '';
+            
+            // Determine which section is currently in view
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                const sectionHeight = section.clientHeight;
+                const scrollPosition = window.scrollY;
+                
+                if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                    currentSectionId = section.id;
+                }
+            });
+            
+            // Update active menu item
+            menuItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === `#${currentSectionId}`) {
+                    item.classList.add('active');
+                }
+            });
+        }
+        
+        // Function to handle menu item clicks
+        function handleMenuItemClick(e) {
+            e.preventDefault();
+            
+            // Get the target section id from the href attribute
+            const targetId = this.getAttribute('href');
+            
+            // If it's a hash link (internal link)
+            if (targetId.startsWith('#')) {
+                const targetSection = document.querySelector(targetId);
+                if (targetSection) {
+                    // Smooth scroll to the target section
+                    window.scrollTo({
+                        top: targetSection.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        }
+        
+        // Function to scroll to top
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+        
+        // Add event listeners
+        window.addEventListener('scroll', updateNavOnScroll);
+        
+        menuItems.forEach(item => {
+            item.addEventListener('click', handleMenuItemClick);
+        });
+        
+        scrollTopBtn.addEventListener('click', scrollToTop);
+        
+        // Initialize the navigation state
+        updateNavOnScroll();
+        
+        // Add hover effect enhancement with JavaScript
+        menuItems.forEach(item => {
+            // Store original color
+            const originalColor = window.getComputedStyle(item).color;
+            
+            item.addEventListener('mouseenter', function() {
+                // Add a pulsing animation on hover
+                this.style.boxShadow = '0 5px 15px rgba(77, 171, 247, 0.4)';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                // Remove the pulsing animation
+                this.style.boxShadow = 'none';
+            });
+        });
+        
+        // Add keyboard navigation support
+        document.addEventListener('keydown', function(e) {
+            // Allow tab navigation through menu items
+            if (e.key === 'Tab') {
+                // Update active menu item based on focus
+                setTimeout(() => {
+                    const focusedElement = document.activeElement;
+                    if (focusedElement && focusedElement.classList.contains('menu-link')) {
+                        menuItems.forEach(item => item.classList.remove('active'));
+                        focusedElement.classList.add('active');
+                    }
+                }, 10);
+            }
+        });
+    </script>
+</body>
+</html>
