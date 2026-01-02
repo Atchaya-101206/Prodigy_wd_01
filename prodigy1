@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Navigation Menu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Navigation Styles */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #2c3e50;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.4s ease;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-scrolled {
+            background-color: #fff;
+            padding: 5px 40px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            color: #3498db;
+            font-weight: 700;
+            font-size: 1.8rem;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            font-size: 2rem;
+        }
+
+        .nav-scrolled .logo {
+            color: #2c3e50;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-left: 30px;
+        }
+
+        .nav-link {
+            color: #ecf0f1;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 20px 0;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-scrolled .nav-link {
+            color: #2c3e50;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 15px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background-color: #3498db;
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-link:hover {
+            color: #3498db;
+        }
+
+        .nav-scrolled .nav-link:hover {
+            color: #3498db;
+        }
+
+        /* Active menu item */
+        .nav-link.active {
+            color: #3498db;
+        }
+
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        /* Menu toggle for mobile */
+        .menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            color: #ecf0f1;
+            cursor: pointer;
+        }
+
+        .nav-scrolled .menu-toggle {
+            color: #2c3e50;
+        }
+
+        /* Main content styles */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 0 20px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin-bottom: 30px;
+        }
+
+        .scroll-indicator {
+            margin-top: 30px;
+            font-size: 2rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        section {
+            padding: 100px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        section h2 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        section p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h3 {
+            color: #3498db;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        footer {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            text-align: center;
+            padding: 40px;
+            margin-top: 60px;
+        }
+
+        /* Scroll indicator in nav */
+        .scroll-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background-color: #3498db;
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .nav-menu {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: #2c3e50;
+                flex-direction: column;
+                align-items: center;
+                padding: 20px 0;
+                transform: translateY(-100%);
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .nav-scrolled .nav-menu {
+                background-color: #fff;
+            }
+
+            .nav-menu.active {
+                transform: translateY(0);
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .nav-item {
+                margin: 15px 0;
+                width: 100%;
+                text-align: center;
+            }
+
+            .nav-link {
+                display: block;
+                padding: 15px;
+            }
+
+            .nav-link::after {
+                bottom: 10px;
+            }
+
+            nav {
+                padding: 0 20px;
+            }
+
+            .nav-scrolled {
+                padding: 5px 20px;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            section {
+                padding: 80px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Menu -->
+    <nav id="mainNav">
+        <div class="scroll-progress" id="scrollProgress"></div>
+        <a href="#" class="logo">
+            <i class="fas fa-code"></i>
+            NavMenu
+        </a>
+
+        <div class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </div>
+
+        <ul class="nav-menu" id="navMenu">
+            <li class="nav-item">
+                <a href="#home" class="nav-link active">Home</a>
+            </li>
+            <li class="nav-item">
+                <a href="#about" class="nav-link">About</a>
+            </li>
+            <li class="nav-item">
+                <a href="#services" class="nav-link">Services</a>
+            </li>
+            <li class="nav-item">
+                <a href="#portfolio" class="nav-link">Portfolio</a>
+            </li>
+            <li class="nav-item">
+                <a href="#contact" class="nav-link">Contact</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <section class="hero" id="home">
+            <h1>Interactive Navigation Menu</h1>
+            <p>This navigation menu changes color and style when scrolling or hovering over menu items. Scroll down to see the effect.</p>
+            <div class="scroll-indicator">
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </section>
+
+        <section id="about">
+            <h2>About Us</h2>
+            <p>This interactive navigation menu demonstrates how to create a fixed navbar that changes appearance based on scroll position and hover interactions. It's built with HTML, CSS, and JavaScript.</p>
+            <p>The menu uses a fixed position to stay visible on all pages and changes from a dark to light background when you scroll down the page. Each menu item also has a hover effect with an animated underline.</p>
+            <div class="content-grid">
+                <div class="card">
+                    <h3>Scroll Effect</h3>
+                    <p>The navigation bar changes background color and padding when you scroll past 50 pixels from the top. Try scrolling to see the transition.</p>
+                </div>
+                <div class="card">
+                    <h3>Hover Effect</h3>
+                    <p>Hover over menu items to see the color change and underline animation. The active menu item is also highlighted based on your scroll position.</p>
+                </div>
+                <div class="card">
+                    <h3>Mobile Responsive</h3>
+                    <p>The menu adapts to different screen sizes. On mobile devices, it transforms into a hamburger menu that expands when clicked.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="services">
+            <h2>Our Services</h2>
+            <p>We specialize in creating interactive web components that enhance user experience. Our navigation menu is just one example of the type of interactive elements we can build for your website.</p>
+            <div class="content-grid">
+                <div class="card">
+                    <h3>Web Development</h3>
+                    <p>Creating responsive, interactive websites with modern technologies and best practices.</p>
+                </div>
+                <div class="card">
+                    <h3>UI/UX Design</h3>
+                    <p>Designing user interfaces that are both beautiful and intuitive to use.</p>
+                </div>
+                <div class="card">
+                    <h3>Interactive Elements</h3>
+                    <p>Building engaging interactive components that make your website stand out.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="portfolio">
+            <h2>Portfolio</h2>
+            <p>Check out some examples of our work with interactive navigation menus and other web components.</p>
+            <div class="content-grid">
+                <div class="card">
+                    <h3>E-commerce Site</h3>
+                    <p>Designed and developed a full e-commerce platform with interactive navigation and product filtering.</p>
+                </div>
+                <div class="card">
+                    <h3>Corporate Website</h3>
+                    <p>Built a responsive corporate website with a dynamic navigation menu that changes on scroll.</p>
+                </div>
+                <div class="card">
+                    <h3>Web Application</h3>
+                    <p>Created a complex web application with a multi-level navigation system and interactive UI elements.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact">
+            <h2>Contact Us</h2>
+            <p>If you're interested in implementing an interactive navigation menu like this one on your website, get in touch with us. We can customize it to match your brand and requirements.</p>
+            <div class="content-grid">
+                <div class="card">
+                    <h3>Get in Touch</h3>
+                    <p>Email: info@example.com</p>
+                    <p>Phone: (123) 456-7890</p>
+                </div>
+                <div class="card">
+                    <h3>Our Office</h3>
+                    <p>123 Web Design Street</p>
+                    <p>Interactive City, IC 10101</p>
+                </div>
+                <div class="card">
+                    <h3>Follow Us</h3>
+                    <p>Twitter: @webdev</p>
+                    <p>GitHub: github.com/webdev</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Interactive Navigation Menu Demo &copy; 2023 | Created with HTML, CSS, and JavaScript</p>
+        <p>Scroll back to the top to see the navigation change back to its original style.</p>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const nav = document.getElementById('mainNav');
+        const navMenu = document.getElementById('navMenu');
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const scrollProgress = document.getElementById('scrollProgress');
+
+        // Toggle mobile menu
+        menuToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            menuToggle.innerHTML = navMenu.classList.contains('active') 
+                ? '<i class="fas fa-times"></i>' 
+                : '<i class="fas fa-bars"></i>';
+        });
+
+        // Close mobile menu when clicking on a link
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    navMenu.classList.remove('active');
+                    menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+                }
+                
+                // Set active link
+                navLinks.forEach(item => item.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+
+        // Change nav style on scroll
+        window.addEventListener('scroll', () => {
+            // Add scrolled class when scroll position is > 50px
+            if (window.scrollY > 50) {
+                nav.classList.add('nav-scrolled');
+            } else {
+                nav.classList.remove('nav-scrolled');
+            }
+            
+            // Update scroll progress indicator
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            scrollProgress.style.width = scrolled + "%";
+            
+            // Update active nav link based on scroll position
+            updateActiveNavLink();
+        });
+
+        // Function to update active nav link based on scroll position
+        function updateActiveNavLink() {
+            let currentSection = '';
+            const sections = document.querySelectorAll('section');
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                
+                if (window.scrollY >= (sectionTop - 200)) {
+                    currentSection = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${currentSection}`) {
+                    link.classList.add('active');
+                }
+            });
+            
+            // If at the top of the page, set home as active
+            if (window.scrollY < 100) {
+                navLinks.forEach(link => link.classList.remove('active'));
+                document.querySelector('a[href="#home"]').classList.add('active');
+            }
+        }
+
+        // Initialize active link
+        updateActiveNavLink();
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Hover effect enhancement for menu items
+        navLinks.forEach(link => {
+            link.addEventListener('mouseenter', function() {
+                // Add a subtle scale effect on hover
+                this.style.transform = 'scale(1.05)';
+                this.style.transition = 'transform 0.2s ease';
+            });
+            
+            link.addEventListener('mouseleave', function() {
+                // Remove the scale effect
+                this.style.transform = 'scale(1)';
+            });
+        });
+
+        // Add a subtle animation to the logo on page load
+        window.addEventListener('load', () => {
+            const logo = document.querySelector('.logo');
+            logo.style.transform = 'translateY(-10px)';
+            logo.style.opacity = '0';
+            
+            setTimeout(() => {
+                logo.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+                logo.style.transform = 'translateY(0)';
+                logo.style.opacity = '1';
+            }, 300);
+        });
+    </script>
+</body>
+</html>
